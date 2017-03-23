@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+    <head> 
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <title>CellularRC</title>
+	    <link rel="shortcut icon" href="http://www.cirlution.com/favicon.ico">
+        
+        <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+        <script type="text/javascript" src="https://skyway.io/dist/0.3/peer.js"></script>
+	<!--<script type="text/javascript" src="https://cdn.skyway.io/skyway.js"></script>-->
+        <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCYgefNHuojh9xFK6EAWPDjQc8-x1bg4o0&amp;libraries=geometry"></script>
+	<script type="text/javascript" src="https://apis.google.com/js/client.js"></script>
+	<script type="text/javascript" src="cellular-rc.js"></script>
+    </head>
+    <body>
+        <!--<video id="android-video" autoplay></video> style="position: absolute; top: 50px; left: 50px; z-index: 5;"
+         Andoid 画面消灯時にカメラが回転するのに対応して320X320　の正方形にする。 -->
+        <!-- HTML5 canvasを重ねる http://www.happytrap.jp/blogs/2012/04/15/8835/     <div style="position: relative;"> -->
+        <video id="android-video" poster="firstframe.jpg" style="height: 320px; width: 320px; position: absolute; top: 40px; left: 10px; z-index: 2;" autoplay></video>
+        <pre id="orient" style="position: absolute; top: 360px; left: 0px; z-index: 3;"></pre> 
+        <canvas id="mouseCanvas" width="240" height="240" style="position: absolute; left: 800px; top: 130px; z-index: 4; border:1px solid #CCC;"></canvas>
+        <canvas id="padCanvas" width="240" height="240" style="position: absolute; left: 800px; top: 130px; z-index: 5;"></canvas>
+        <button id="gpSW" style="position: absolute; top: 380px; left: 900px; z-index: 3;">GamePad有効</button> 
+        <div style="height:400px; width:1100px; background-color: #AAA" id="map-canvas"></div>
+        <button id="camSW">カメラ切替</button>
+        中心：
+        (<label for="gpsCenter">GPS</label>
+        <input id="gpsCenter" name="RadioGroup1" type="radio" />
+        / <label for="encCenter">エンコーダ</label>
+        <input id="encCenter" name="RadioGroup1" type="radio" checked="checked"/>
+        / <label for="MapPanOn">パン</label>
+        <input id="MapPanOn" name="RadioGroup1" type="radio" />)
+        , 自動操縦:
+        (<label for="autoOff">Off</label>
+        <input id="autoOff" name="RadioGroup3" type="radio"  checked="checked" />
+        / <label for="selfOn">半自動</label>
+        <input id="selfOn" name="RadioGroup3" type="radio" />
+        / <label for="autoOn">On</label>
+        <input id="autoOn" name="RadioGroup3" type="radio" />)
+        <button id="mapClear">Mapクリア</button>
+        <br />
+        Android:<span id="Astat"></span>
+        <a href="mapLink.html" target="_blank">軌跡一覧表示ページ</a>
+        <table>
+            <tr>
+                <td style="vertical-align: top;">
+                    <span id="mXY"></span><br />
+		    ホイル転距離<br />
+		    <input type="number" id="countM" value="230" style="width:50px">mm<br />
+                    RC-B電圧:<span id="RcBatVol"></span> <br />
+                    <!--camera:<br />
+                    <button id="videoRotate270">270°</button>
+                    <button id="videoRotate0">0°</button><br />
+                    -->
+                    <br />
+                    <!-- input type="number" http://www.htmq.com/html5/input_type_number.shtml -->
+                    Y範囲<input type="number" id="yRange" min="200" max="600" value="400" style="width:50px" /><br />
+                    Y補正<input type="number" id="yCenter" min="1400" max="1600" value="1500" style="width:50px" /><br />
+                    X範囲<input type="number" id="xRange" min="200" max="600" value="400" style="width:50px" /><br />
+                    X補正<input type="number" id="xCenter" min="1400" max="1600" value="1500"  style="width:50px" /><br />
+                </td>
+   		<td style="vertical-align: top;">
+		    <!--Button for the user to click to initiate auth sequence -->
+		    <button id="authorizeButton" onclick="handleAuth()">Authorize GoogleID</button><br />
+                    <!-- <select id="peers"><option>Serect Android-ID</option></select><br /> -->
+		    <textarea id="messages" style="width:400px; height:170px;"></textarea><br />
+                </td>
+                <td style="vertical-align: top;">
+                    <button id="btConn">BT接続</button><br />
+                    <textarea id="btMessages" style="width:200px; height:110px;"></textarea><br />
+                    <textarea id="commandStat" style="width:200px; height:40px;"></textarea><br />
+                </td>
+                <td style="vertical-align: top;"> <!-- text-align:center;">  -->
+		    <!-- input要素に type="range" を指定すると、大まかな数値の入力欄を作成できます。 http://www.tagindex.com/html5/form/input_range.html-->  
+	    	    Camera Y:<button id="xCset">Center</button><br />
+		    MIN↑<input type="number" id="yCMinRange" min="900" max="1500" value="1000" style="width:50px" /><br />
+                    C補正<input type="number" id="yCCenter" min="1350" max="1550" value="1500" style="width:50px" /><br />
+		    MAX↓<input type="number" id="yCMaxRange" min="1500" max="1700" value="1500" style="width:50px" /><br />
+                    <!--<input type="range" id="yCamera" style="transform:rotate(90deg);position: relative; left: 0px; top: 70px"/><br />-->
+                    <input type="range" id="yCamera" min="900" max="2100"/><br />
+                </td>
+                <td style="vertical-align: top;">
+                    Camera X :  <button id="yCSet">Center</button><br />
+                    MIN↑<input type="number" id="xCMinRange" min="900" max="1500" value="1000" style="width:50px" /><br />
+                    C補正<input type="number" id="xCCenter" min="1400" max="1600" value="1500" style="width:50px" /><br />
+                    MAX↓<input type="number" id="xCMaxRange" min="1500" max="1700" value="1500" style="width:50px" /><br />
+		    <!--td 幅を狭くできない、tdでInput Range囲まないと　レバーをマウス操作できない現象あり2016/04/22-->
+                    <input type="range" id="xCamera" min="900" max="2100"/> <!--style="transform:rotate(180deg)"/>-->
+                </td>
+            </tr>
+        </table>
+        <div id="droidroneStat">受信待ち.ページがズームしているとMapが正常に表示されないことがあります</div>
+        <br />
+	JSON:<span id="JSON"></span>
+        <p><button id="deBug">Debug</button></p>
+        <p>snap-area:</p>
+        <div id="snap-area"></div>
+        <canvas id="tmp-canvas"></canvas>
+    </body>
+</html>

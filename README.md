@@ -1,11 +1,11 @@
 # Droidorone-web
-https://i386koba.github.io/Droidorone-web/
+https://i386koba.github.io/CellularRC.web/
 
 で画面を開けます。
 
 航路の記録は
 
-https://i386koba.github.io/Droidorone-web/mapLink.html
+https://i386koba.github.io/CellularRC.web/mapLink.html
 
 から参照できます。
 

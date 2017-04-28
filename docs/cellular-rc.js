@@ -385,12 +385,12 @@ function uiInitialize() {
 }
 
 function setMsgTextArea(str) {
-    $("#messages").val(str + "\n" + $("#messages").val());
+    $("#messages").val(str + "\n" + $("#messages").val().substr(0,1000));
     $("#messages").scrollTop();
 }
 
 function setBtTextArea(str) {
-    $("#btMessages").val(str + "\n" + $("#btMessages").val());
+    $("#btMessages").val(str + "\n" + $("#btMessages").val().substr(0,1000));
     $("#btMessages").scrollTop();
 }
 
@@ -398,6 +398,7 @@ var encPos = null;
 var gpsPoly; //GPSポリライン
 var encPoly; //ホイル回転推定ポリライン
 var setMarker = null; //現在地修正マーカー
+var gmMarker = null; //GPSモジュ‐ルマーカー
 var startInfoWin; //位置修正出来ますよインフォ
 var setPos = null; //位置修正ポジ
 var setDrag = false; //位置修正中
@@ -454,6 +455,17 @@ function polyInitialize(pos) {
         zIndex: 3// 重りの優先値(z-index)
     });
     map.setCenter(pos);
+    //GPSモジュールマーカー
+    gmMarker = new google.maps.Marker({
+        icon: {
+            path: google.maps.SymbolPath.CIRCLE,
+            scale: 3,
+            strokeColor: '#00FF00'
+        },
+        map: map,
+        position: pos,
+        zIndex: 4// 重りの優先値(z-index)
+    });
     //情報ウィンドウを開く/閉じる http://www.ajaxtower.jp/googlemaps/ginfowindow/index2.html
     //google.maps.InfoWindow class
     //https://developers.google.com/maps/documentation/javascript/3.exp/reference?hl=ja#InfoWindow
@@ -554,7 +566,8 @@ function attachMessage(marker, rota) {
                 + ',GPS高度:' + jData.alti + 'm'
                 + ',方向:' + rota + '°' + ',pitch ' + jData.pitch + '°'
                 + ',roll:' + jData.roll + '°'
-                + '<br>btr:' + jData.btr + '</div>'
+                //+ '<br>btr:' + jData.btr
+                + '</div>'
     });
     // イベントを取得するListenerを追加
     google.maps.event.addListener(marker, 'click', function () {
@@ -591,9 +604,12 @@ for (var i = 0; i < ori8.length; i++) {
 }
 var encMarker = null;
 function readJData(res) {
+    //res.replace(/\r?\n/g, "");
     $("#JSON").html(res);
     //Androidデータ読み出し
-    jData = eval('(' + res + ')');
+    //jData = eval('(' + res + ')');
+    jData = JSON.parse(res);
+    //console.log(res);
     //Chromeデベロッパー・ツールの機能 http://www.buildinsider.net/web/chromedevtools/01#page-9
     //jData.rota 0-180と0~-180 -> 0-360変更済み
     //現在位置
@@ -628,51 +644,73 @@ function readJData(res) {
 
     //BuleTooth受信解析
     var btr = jData.btr;
-    if (btr !== "") { //&& lastBtR !== btr) {
-        lastBtR = btr;
-        setBtTextArea(btr);
-        var dis = btrDecode(btr);
-        if (encPos !== null) {
-            if (dis !== 0) {
-                var avgRota = jData.rota;
-                if (rCount !== 0) {
-                    avgRota = sumRota / rCount;
-                    sumRota = 0;
-                    rCount = 0;
+    if (btr !== "") { 
+        //GPSモジュール　解析
+        //ＧＰＳ受信機キット　１ＰＰＳ出力付き　「みちびき」対応　http://akizukidenshi.com/catalog/g/gK-09991/
+        //GPSのNMEAフォーマットhttp://www.hiramine.com/physicalcomputing/general/gps_nmeaformat.html
+        //例 $GPGGA,062950.000,3550.4017,N,13757.4716,E,2,11,0.81,652.2,M,37.7,M,0000,0000*6C
+        if (btr.substr(0, 6) === "$GPGGA") {
+            //https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/String/split
+            var gpggaArray = btr.split(",");
+            var utc = gpggaArray[1];
+            var latStr = gpggaArray[2];
+            //console.log("lat,dec:" + latStr.substr(2));
+            gmLat = parseFloat(latStr.substr(0, 2)) + (parseFloat(latStr.substr(2)) / 60);
+            var lngStr = gpggaArray[4];
+            //console.log("lng,dec:" + lngStr.substr(3));
+            gmLng = parseFloat(lngStr.substr(0, 3)) + (parseFloat(lngStr.substr(3)) / 60);
+            //setBtTextArea("lat:" + gmLat + ", lng:" + gmLng);
+            var gmPos = new google.maps.LatLng(gmLat, gmLng);
+            //gmMarker.setMap(null);
+            gmMarker.setPosition(gmPos);
+            //gmMarker.setMap(map);
+        } else {
+            lastBtR = btr;
+            //if (lastBtR !== btr) {
+            setBtTextArea(btr);
+            var dis = btrDecode(btr);
+            if (encPos !== null) {
+                if (dis !== 0) {
+                    var avgRota = jData.rota;
+                    if (rCount !== 0) {
+                        avgRota = sumRota / rCount;
+                        sumRota = 0;
+                        rCount = 0;
+                    }
+                    encPos = google.maps.geometry.spherical.computeOffset(encPos, dis, avgRota);
+                    //地図上の２点間の距離を求める http://www.nanchatte.com/map/computeDistance.html
+                    //var distance = google.maps.geometry.spherical.computeDistanceBetween(encPos, lastEncPos);
+                    //setBtTextArea("距離" + distance.toFixed(2) + "m," + btr + ",rot:" + jData.rota + "°.");
+                    //距離が2m動いたらパス描画,データ記録
+                    //if (distance > 2) {
+                    sumDis += dis;
+                    if (sumDis > 2) {
+                        encPathDraw(encPos, avgRota);
+                        recDis += sumDis;
+                        videoSnapShot(jData);
+                        sumDis = 0;
+                    }
                 }
-                encPos = google.maps.geometry.spherical.computeOffset(encPos, dis, avgRota);
-                //地図上の２点間の距離を求める http://www.nanchatte.com/map/computeDistance.html
-                //var distance = google.maps.geometry.spherical.computeDistanceBetween(encPos, lastEncPos);
-                //setBtTextArea("距離" + distance.toFixed(2) + "m," + btr + ",rot:" + jData.rota + "°.");
-                //距離が2m動いたらパス描画,データ記録
-                //if (distance > 2) {
-                sumDis += dis;
-                if (sumDis > 2) {
-                    encPathDraw(encPos, avgRota);
-                    recDis += sumDis;
-                    videoSnapShot(jData);
-                    sumDis = 0;
+                //地図中心　エンコーダ
+                if ($('#encCenter').prop('checked')) {
+                    map.setCenter(encPos);
                 }
+                //Encマーカー　青
+                if (encMarker !== null) {
+                    encMarker.setMap(null);
+                }
+                encMarker = new google.maps.Marker({
+                    position: encPos,
+                    icon: {path: 'M -2,2 0,-2 2,2 0,0 z', // 矢印中心が先っぽだけだったのでPath作った。
+                        //var arrowPath = google.maps.SymbolPath.FORWARD_CLOSED_ARROW;
+                        scale: 3,
+                        strokeColor: '#0000FF',
+                        rotation: jData.rota
+                    },
+                    map: map,
+                    zIndex: 2// 重なりの優先値(z-index)
+                });
             }
-            //地図中心　エンコーダ
-            if ($('#encCenter').prop('checked')) {
-                map.setCenter(encPos);
-            }
-            //Encマーカー　青
-            if (encMarker !== null) {
-                encMarker.setMap(null);
-            }
-            encMarker = new google.maps.Marker({
-                position: encPos,
-                icon: {path: 'M -2,2 0,-2 2,2 0,0 z', // 矢印中心が先っぽだけだったのでPath作った。
-                    //var arrowPath = google.maps.SymbolPath.FORWARD_CLOSED_ARROW;
-                    scale: 3,
-                    strokeColor: '#0000FF',
-                    rotation: jData.rota
-                },
-                map: map,
-                zIndex: 2// 重なりの優先値(z-index)
-            });
         }
     }
     //`スマフォGPS受信
@@ -686,13 +724,13 @@ function readJData(res) {
             polyInitialize(gpsPos);
         }
         //GPS (位置設定までGPSで地図中心
-        if ( setPos === null) { 
-           map.setCenter(gpsPos);
-           setMarker.setPosition(gpsPos);
-        } 
+        if (setPos === null) {
+            map.setCenter(gpsPos);
+            setMarker.setPosition(gpsPos);
+        }
         //地図中心　
         if ($('#gpsCenter').prop('checked')) {
-           map.setCenter(gpsPos);  
+            map.setCenter(gpsPos);
         }
         if (gpsAccCount === 0) {
             //前回GPS精度円を除去
@@ -1122,7 +1160,7 @@ function gdDelFolder() {
         console.log(resp);
     });
     setMsgTextArea('移動距離が短いので軌跡記録を破棄します.');
-   
+
 }
 //HTML5のvideoとcanvasで動画のキャプチャを取る http://maepon.skpn.com/web/entry-32.html
 //GDアップロードにはSimple、マルチパートがある。

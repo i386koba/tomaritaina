@@ -379,19 +379,21 @@ function uiInitialize() {
     //テスト http://qiita.com/shizuma/items/d561f37f864c3ebb5096 jQuery 便利なonを使おう（on click)
     //$('#deBug').click(getSnap);
     //debug カクチュウ　35.764267, 137.954661
-    $('#deBug').click(function () {
-        readJData("{'no':'DeBug','lat':35.764267,'lng':137.954661,'alti':700,'accuracy':10,'btr':'BAT:0.0'}");
-    });
+//    $('#deBug').click(function () {
+//        readJData("{'no':'DeBug','lat':35.764267,'lng':137.954661,'alti':700,'accuracy':10,'btr':'BAT:0.0'}");
+//    });
 }
 
 function setMsgTextArea(str) {
-    $("#messages").val(str + "\n" + $("#messages").val().substr(0,1000));
-    $("#messages").scrollTop();
+    $("#messages").val(str + "\n" + $("#messages").val());
+    //http://www.jquerystudy.info/reference/css/scrollTop.html
+    //$("#messages").scrollTop();
 }
 
 function setBtTextArea(str) {
-    $("#btMessages").val(str + "\n" + $("#btMessages").val().substr(0,1000));
-    $("#btMessages").scrollTop();
+    var val = $("#btMessages").val().substr(0, 100);
+    $("#btMessages").val(str + "\n" + val);
+    //$("#btMessages").scrollTop();
 }
 
 var encPos = null;
@@ -452,7 +454,7 @@ function polyInitialize(pos) {
         draggable: true, // ドラッグ可能にする
         map: map,
         position: pos,
-        zIndex: 3// 重りの優先値(z-index)
+        zIndex: 4// 重りの優先値(z-index)
     });
     map.setCenter(pos);
     //GPSモジュールマーカー
@@ -464,7 +466,7 @@ function polyInitialize(pos) {
         },
         map: map,
         position: pos,
-        zIndex: 4// 重りの優先値(z-index)
+        zIndex: 3// 重りの優先値(z-index)
     });
     //情報ウィンドウを開く/閉じる http://www.ajaxtower.jp/googlemaps/ginfowindow/index2.html
     //google.maps.InfoWindow class
@@ -603,6 +605,8 @@ for (var i = 0; i < ori8.length; i++) {
     oriBar += ("|........|........|" + ori8[i]);
 }
 var encMarker = null;
+ var gpsNum = 0;
+ var hdop = 0;
 function readJData(res) {
     //res.replace(/\r?\n/g, "");
     $("#JSON").html(res);
@@ -619,7 +623,8 @@ function readJData(res) {
             + ", 高度: " + jData.alti + 'm'
             + ', 誤差: ' + jData.accuracy + 'm'
             + ', pitch: ' + jData.pitch + '°'
-            + ', roll: ' + jData.roll + '°');
+            + ', roll: ' + jData.roll + '°'
+            + ', GPS数: ' +gpsNum + ', HDOP: ' + hdop);
     //方向平均値用
     sumRota += jData.rota;
     rCount++;
@@ -644,7 +649,7 @@ function readJData(res) {
 
     //BuleTooth受信解析
     var btr = jData.btr;
-    if (btr !== "") { 
+    if (btr !== "") {
         //GPSモジュール　解析
         //ＧＰＳ受信機キット　１ＰＰＳ出力付き　「みちびき」対応　http://akizukidenshi.com/catalog/g/gK-09991/
         //GPSのNMEAフォーマットhttp://www.hiramine.com/physicalcomputing/general/gps_nmeaformat.html
@@ -654,6 +659,8 @@ function readJData(res) {
             var gpggaArray = btr.split(",");
             var utc = gpggaArray[1];
             var latStr = gpggaArray[2];
+            gpsNum = gpggaArray[7];
+            hdop = gpggaArray[8];//HDOP 水平精度低下率
             //console.log("lat,dec:" + latStr.substr(2));
             gmLat = parseFloat(latStr.substr(0, 2)) + (parseFloat(latStr.substr(2)) / 60);
             var lngStr = gpggaArray[4];
@@ -662,7 +669,9 @@ function readJData(res) {
             //setBtTextArea("lat:" + gmLat + ", lng:" + gmLng);
             var gmPos = new google.maps.LatLng(gmLat, gmLng);
             //gmMarker.setMap(null);
-            gmMarker.setPosition(gmPos);
+            if (gmMarker !== null) {
+                gmMarker.setPosition(gmPos);
+            }
             //gmMarker.setMap(map);
         } else {
             lastBtR = btr;
@@ -973,8 +982,9 @@ const close_delim = "\r\n--" + boundary + "--";
 function handleAuth() {
     //既存のPeer再接続（Android再起動の場合）
     if (helloAndroid) {
-        peer.destroy();
-        helloAndroid = false;
+        return false;
+        //peer.destroy();
+        //helloAndroid = false;
     }
     peer = new Peer({key: apiKey, debug: 3});
     peer.on('error', function (err) {
@@ -983,7 +993,8 @@ function handleAuth() {
     peer.on('close', function () {
         peer.destroy();
         setMsgTextArea('peer Close: : ');
-        $("#authorizeButton").prop("disabled", false);
+        helloAndroid = false;
+        //$("#authorizeButton").prop("disabled", false);
     });
     peer.on('open', function () {
         // - 自分のIDはpeerオブジェクトのidプロパティに存在する
@@ -1057,12 +1068,11 @@ function loadPeerId() {
                         console.log('Title: ' + resp.title);
                         console.log('Description: ' + resp.description);
                         console.log('MIME type: ' + resp.mimeType);
-                        //peerStart(resp.description);
                         setMsgTextArea("Android peer.id:" + resp.description);
                         //Peer ID 接続
                         peerStart(resp.description);
                         //ボタンを無効にする
-                        $("#authorizeButton").prop("disabled", true);
+                        //$("#authorizeButton").prop("disabled", true);
                     });
                 } else {
                     setMsgTextArea("SkyWayAndroid.id not found:");
@@ -1217,6 +1227,7 @@ function peerStart(destPeerId) {
     setMsgTextArea('Try connect: ' + destPeerId);
     peerdConn.on('error', function (err) {
         setMsgTextArea('conn-err: ' + err);
+        console.log(err);
     });
     // 接続が完了した場合のイベントの設定
     peerdConn.on("open", function () {

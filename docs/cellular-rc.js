@@ -314,7 +314,7 @@ function gamePadListen(gamePadID, gamePadInterval) {
      str += "value:" + button.value + " }\n";
      } */
 }
-
+var muted = false;
 function uiInitialize() {
 //Camera servo control
 //レンジ入力（input[type=range]）の変更時の値をリアルタイムに取得する　http://elearn.jp/jmemo/jquery/memo-287.html
@@ -382,6 +382,18 @@ function uiInitialize() {
 //    $('#deBug').click(function () {
 //        readJData("{'no':'DeBug','lat':35.764267,'lng':137.954661,'alti':700,'accuracy':10,'btr':'BAT:0.0'}");
 //    });
+    //JavaScript入門（HTML5編） 音量とミュート
+    //http://www.pori2.net/html5/Video/040.html
+    var media = document.getElementById("android-video");
+    $('#mute').click(function () {
+        if (muted === false) {
+            media.muted = true;
+            muted = true;
+        } else {
+            media.muted = false;
+            muted = false;
+        }
+    });
 }
 
 function setMsgTextArea(str) {
@@ -605,8 +617,8 @@ for (var i = 0; i < ori8.length; i++) {
     oriBar += ("|........|........|" + ori8[i]);
 }
 var encMarker = null;
- var gpsNum = 0;
- var hdop = 0;
+var gpsNum = 0;
+var hdop = 0;
 function readJData(res) {
     //res.replace(/\r?\n/g, "");
     $("#JSON").html(res);
@@ -624,7 +636,7 @@ function readJData(res) {
             + ', 誤差: ' + jData.accuracy + 'm'
             + ', pitch: ' + jData.pitch + '°'
             + ', roll: ' + jData.roll + '°'
-            + ', GPS数: ' +gpsNum + ', HDOP: ' + hdop);
+            + ', GPS数: ' + gpsNum + ', HDOP: ' + hdop);
     //方向平均値用
     sumRota += jData.rota;
     rCount++;

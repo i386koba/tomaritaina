@@ -1,19 +1,12 @@
-# Droidorone-web
-https://i386koba.github.io/CellularRC.web/
+# CelluCon.web
+* https://i386koba.github.io/CelluCon.web/ で画面を開けます。
+* 航路の記録は https://i386koba.github.io/CelluCon.web/mapLink.html から参照できます。
+* セルコン プロジェクト全体は https://github.com/cellucon
 
-で画面を開けます。
-
-航路の記録は
-
-https://i386koba.github.io/CellularRC.web/mapLink.html
-
-から参照できます。
-
-##Android端末とPeerIDの交換
-
+## Android端末とPeerIDの交換
 Androidのアプリ
-https://github.com/i386koba/Droidrone
-　は、自身のGoogleIDでログインし、GoogleDriveにデータコネクション待ちのPeerIDをファイル保存します。
+
+は、自身のGoogleIDでログインし、GoogleDriveにデータコネクション待ちのPeerIDをファイル保存します。
 
 Web画面は［Authorize GoogleID］ボタンで、Androidと同じGoogleIDでログインし、
 AndroidによってGoogleDriveに保存されたPeerIDを読みに行って、

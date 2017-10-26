@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html>
-    <head> 
+    <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        
+
         <title>CelluCon (CellularControl)</title>
 	    <link rel="shortcut icon" href="favicon.ico">
-        
+
         <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
         <script type="text/javascript" src="https://skyway.io/dist/0.3/peer.js"></script>
 	<!--<script type="text/javascript" src="https://cdn.skyway.io/skyway.js"></script>-->
@@ -19,10 +19,10 @@
          Andoid 画面消灯時にカメラが回転するのに対応して320X320　の正方形にする。 -->
         <!-- HTML5 canvasを重ねる http://www.happytrap.jp/blogs/2012/04/15/8835/     <div style="position: relative;"> -->
         <video id="android-video" poster="firstframe.jpg" style="height: 320px; width: 320px; position: absolute; top: 40px; left: 10px; z-index: 2;" autoplay></video>
-        <pre id="orient" style="position: absolute; top: 360px; left: 0px; z-index: 3;"></pre> 
+        <pre id="orient" style="position: absolute; top: 360px; left: 0px; z-index: 3;"></pre>
         <canvas id="mouseCanvas" width="240" height="240" style="position: absolute; left: 800px; top: 130px; z-index: 4; border:1px solid #CCC;"></canvas>
         <canvas id="padCanvas" width="240" height="240" style="position: absolute; left: 800px; top: 130px; z-index: 5;"></canvas>
-        <button id="gpSW" style="position: absolute; top: 380px; left: 900px; z-index: 3;">GamePad有効</button> 
+        <button id="gpSW" style="position: absolute; top: 380px; left: 900px; z-index: 3;">GamePad有効</button>
         <div style="height:400px; width:1100px; background-color: #AAA" id="map-canvas"></div>
         <button id="camSW">カメラ切替</button>
         <button id="mute">Mute-SW</button>
@@ -43,6 +43,8 @@
         <button id="mapClear">Mapクリア</button>
         <br />
         Android:<span id="Astat"></span>
+        <label for="mapLink">軌跡記録</label>
+        <input id="mapLink" name="mapLink" type="checkbox" />
         <a href="mapLink.html" target="_blank">軌跡一覧表示ページ</a>
         <table>
             <tr>
@@ -74,7 +76,7 @@
                     <textarea id="commandStat" style="width:200px; height:40px;"></textarea><br />
                 </td>
                 <td style="vertical-align: top;"> <!-- text-align:center;">  -->
-		    <!-- input要素に type="range" を指定すると、大まかな数値の入力欄を作成できます。 http://www.tagindex.com/html5/form/input_range.html-->  
+		    <!-- input要素に type="range" を指定すると、大まかな数値の入力欄を作成できます。 http://www.tagindex.com/html5/form/input_range.html-->
 	    	    Camera Y:<button id="xCset">Center</button><br />
 		    MIN↑<input type="number" id="yCMinRange" min="900" max="1500" value="1000" style="width:50px" /><br />
                     C補正<input type="number" id="yCCenter" min="1350" max="1550" value="1500" style="width:50px" /><br />

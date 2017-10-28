@@ -708,7 +708,10 @@ function readJData(res) {
                     if (sumDis > 2) {
                         encPathDraw(encPos, avgRota);
                         recDis += sumDis;
-                        videoSnapShot(jData);
+                        if ($('#mapLink').prop('checked')) {
+                          //軌跡記録
+                          videoSnapShot(jData);
+                        }
                         sumDis = 0;
                     }
                 }

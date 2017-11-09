@@ -4,6 +4,9 @@
 * 技術情報は wikiにアップしていきます。　https://github.com/i386koba/CelluCon.web/wiki
 * セルコン プロジェクト全体は https://github.com/cellucon/ より。
 
+Oauth  
+https://developers.google.com/identity/protocols/OAuth2
+
 # 今後の予定として:
 ## 操縦のライブ映像を共有したい。
 SkyWay( http://nttcom.github.io/skyway/ )の多人数参加のグループビデオチャットを利用予定。

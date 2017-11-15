@@ -1,7 +1,6 @@
 //NetBeans でコード内の TODO を一覧表示させる http://wp.tekapo.com/2012/12/29/how-to-show-todo-list-in-netbeans/
 //http://qiita.com/kazu56/items/36b025dac5802b76715c 【jQuery】フォーム部品の取得・設定まとめ
-//テストページ
-//https://i386koba.github.io/Droidorone-web/
+
 var google;
 google.maps.event.addDomListener(window, 'load', initialize);
 var map;

@@ -1015,7 +1015,8 @@ function handleAuth() {
         setMsgTextArea('My PeerID : ' + peer.id);
     });
     //immediate: false
-    gapi.auth.authorize({client_id: CLIENT_ID, scope: SCOPES.join(" "), immediate: false}, handleAuthResult);
+    //https://developers.google.com/identity/protocols/OpenIDConnect#prompt
+    gapi.auth.authorize({client_id: CLIENT_ID, scope: SCOPES.join(" "), immediate: false, prompt: select_account}, handleAuthResult);
     return false;
 }
 
@@ -1032,7 +1033,7 @@ function handleAuthResult(authResult) {
     } else {
 // No access token could be retrieved, show the button to start the authorization flow.
         authButton.onclick = function () {
-            gapi.auth.authorize({'client_id': CLIENT_ID, 'scope': SCOPES.join(" "), 'immediate': false}, handleAuthResult);
+            gapi.auth.authorize({'client_id': CLIENT_ID, 'scope': SCOPES.join(" "), 'immediate': false, prompt: select_account}, handleAuthResult);
         };
     }
 }

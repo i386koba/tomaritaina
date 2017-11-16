@@ -1016,7 +1016,7 @@ function handleAuth() {
     });
     //immediate: false
     //https://developers.google.com/api-client-library/javascript/reference/referencedocs#advanced
-    gapi.auth.authorize({client_id: CLIENT_ID, scope: SCOPES.join(" "), immediate: false, prompt: 'select_account'}, handleAuthResult);
+    gapi.auth.authorize({client_id: CLIENT_ID, scope: SCOPES.join(" "), immediate: true, prompt: 'select_account'}, handleAuthResult);
     return false;
 }
 
@@ -1033,7 +1033,7 @@ function handleAuthResult(authResult) {
     } else {
 // No access token could be retrieved, show the button to start the authorization flow.
         authButton.onclick = function () {
-            gapi.auth.authorize({'client_id': CLIENT_ID, 'scope': SCOPES.join(" "), 'immediate': false, prompt: 'select_account'}, handleAuthResult);
+            gapi.auth.authorize({'client_id': CLIENT_ID, 'scope': SCOPES.join(" "), 'immediate': true, prompt: 'select_account'}, handleAuthResult);
         };
     }
 }

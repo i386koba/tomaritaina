@@ -9,13 +9,16 @@ Oauth
 https://developers.google.com/identity/protocols/OAuth2
 
 GoogleIDの選択ポップアップが出ますのでAndroidアプリでログインしたGoogleIDを選択してください。
+
 この後、「このアプリは確認されていません」と出ます。
 
 Google、未承認アプリに警告画面　フィッシング詐欺対策を強化にありますように2017年7月18日より、セルコンのようなGoogleの承認プロセスを通過していないWebアプリでは、このような警告が出ます。
 
-管理コンソールと Reports API に Google+ の新指標を追加、ユーザーレベルでの使用状況や導入状況がより正確に
+New security protections to reduce risk from unverified apps
 
-https://gsuiteupdates-ja.googleblog.com/2017/07/reports-api-google.html
+July 18, 2017
+
+https://gsuite-developers.googleblog.com/2017/07/new-security-protections-to-reduce-risk.html
 
 # 今後の予定として:
 ## 操縦のライブ映像を共有したい。

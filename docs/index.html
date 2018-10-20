@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>泊まりたい伊那 マップ</title>
+    <link rel="shortcut icon" href="favicon.ico">
+
+    <!--link rel="stylesheet" href="style.css"
+  Google Map を全画面表示する http://wot.pro.tok2.com/web/api/gmap/view03.html
+  -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <style type="text/css">
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+    <!--
+  <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+
+  <script type="text/javascript" src="https://apis.google.com/js/client.js"></script>
+    -->
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCYgefNHuojh9xFK6EAWPDjQc8-x1bg4o0&amp;libraries=geometry"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.5.5/firebase.js"></script>
+    <script>
+
+        // Initialize Firebase
+        var config = {
+            apiKey: "AIzaSyB_x2pQrABuup5TTQ1sS80NA-vhKx-Q8Y0",
+            authDomain: "tomaritaina.firebaseapp.com",
+            databaseURL: "https://tomaritaina.firebaseio.com",
+            projectId: "tomaritaina",
+            storageBucket: "tomaritaina.appspot.com",
+            messagingSenderId: "30260842036"
+        };
+        firebase.initializeApp(config);
+
+        var google;
+        var map;
+        //var makers = [];
+        //DOM読み込み完了　初期化
+        google.maps.event.addDomListener(window, 'load', function () {
+            //日本中心に地図
+            var mapOptions = {
+                zoom: 2,
+                center: new google.maps.LatLng(35, 138),
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+                //mapTypeId: google.maps.MapTypeId.TERRAIN
+                //noClear: false //http://www.openspc2.org/Google/Maps/api3/Map_option/noClear/
+            };
+            map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+            // Check if current user has authorized this application. immediate: false
+
+
+            function zoom(lat, lng) {
+                map.setOptions({
+                    zoom: 18,
+                    center: new google.maps.LatLng(lat, lng)
+                });
+            }
+            var rPoly = new google.maps.Polyline({
+                strokeColor: '#0000FF',
+                strokeOpacity: 1.0,
+                strokeWeight: 3
+            });
+
+            var lastInfoWin = new google.maps.InfoWindow();
+            var infoWins = [];
+            var rMarkers = [];
+
+            function onMarkerClickZoom(marker, fID) {
+                //Google Maps APIでマーカをクリックしたときに、個別の内容のInfoWindowを表示したい。
+                //http://qiita.com/Mitsunori_Tsukada/items/6e21a42baf17967e9413
+                //以下　google.maps.event.addListener　を関数経由で呼ばないと最初のマーカーとパスが表示されるだけ
+                //関数経由で定義するとクリックでちゃんとマーカーが描画される
+                google.maps.event.addListener(marker, 'click', function (ev) {
+                    map.setOptions({
+                        zoom: 20,
+                        center: ev.latLng
+                    });
+                    //マーカー、パスのクリア
+                    if (rPoly.getMap() !== null) {
+                        //console.log("rPath Clear:");
+                        var path = rPoly.getPath();
+                        rPoly.setMap(null);
+                        path.clear();
+                        for (var i = 0; i < rMarkers.length; i++) {
+                            //console.log(rMarkers[i]);
+                            rMarkers[i].setMap(null);
+                            //console.log("rMarkers Clear:" + i);
+                        }
+                        rMarkers = [];
+                        infoWins = [];
+                    }
+
+                    console.log("zoom:fID:" + fID);
+                    //https://developers.google.com/drive/v2/reference/files/list
+                    var request = gapi.client.drive.files.list({
+                        q: "'" + fID + "' in parents and trashed = false"
+                    });
+                    //console.log(map);
+                    request.execute(function (resp) {
+                        console.log("Google drive track load folder.");
+                        //appendPre('Files:');
+                        var files = resp.items;
+                        if (files && files.length > 0) {
+                            var rPath = rPoly.getPath();
+                            //つい忘れてしまう配列のソート方法 http://qiita.com/PianoScoreJP/items/f0ff7345229871039672
+                            files.sort(function (a, b) {
+                                if (a.title < b.title) return -1;
+                                if (a.title > b.title) return 1;
+                                return 0;
+                            });
+                            for (var i = 0; i < files.length; i++) {
+                                var file = files[i];
+                                //console.log(file.thumbnailLink);
+                                //$("#info-text").val(file.description);
+                                //console.log(file.description);
+                                //console.log(file.webContentLink);
+                                var jData = eval('(' + file.description + ')');
+                                var pos = new google.maps.LatLng(jData.lat, jData.lng);
+                                //console.log(pos.lat() + ', ' + pos.lng());
+                                //maker
+                                var rMarker = new google.maps.Marker({
+                                    position: pos,
+                                    icon: {
+                                        path: 'M -2,2 0,-2 2,2 0,0 z', //arrowPath,
+                                        scale: 3,
+                                        strokeColor: '#00FF00',
+                                        rotation: jData.rota
+                                        //var arrowPath = google.maps.SymbolPath.FORWARD_CLOSED_ARROW; 矢印中心を移動したかっのでPath作った。
+                                    }
+                                });
+                                rMarker.setMap(map);
+                                //console.log(rMarker);
+                                rPath.push(pos);
+                                //infowin
+                                var date = new Date(jData.time);
+                                var infoWinMsg = '<div class="infowindow' + jData.no + '">'
+                                    //403 エラー　https://ja.wikipedia.org/wiki/HTTP_403           
+                                    + '<img src="' + file.thumbnailLink + '" /><br />'
+                                    + 'No.' + i + ' , '
+                                    + date.toLocaleString() + '<br />'
+                                    + '高度 : ' + Math.round(jData.alti) + 'm'
+                                    + ', 方向 : ' + Math.round(jData.rota)
+                                    + '°<br />pitch : ' + Math.round(jData.pitch)
+                                    + '°, roll : ' + Math.round(jData.roll)
+                                    + '°<br />GPS誤差 : ' + Math.round(jData.accuracy) + 'm<br />';
+                                if (i !== 0) {
+                                    infoWinMsg += ' [ <a onclick="openInfo(' + (i - 1) + ')" href="#">  Pre </a> ] ';
+                                }
+                                infoWinMsg += ' [ <a onclick="openInfo(' + (i + 1) + ')" href="#"> Next </a> ] ';
+                                infoWinMsg += ' [ <a href="' + file.webContentLink + '" target="_blank"> DownLoad </a> ] </div>';
+                                //関数で呼ばないとInfowindowが重なる
+                                infoWins.push(attachMessage(rMarker, infoWinMsg));
+                                rMarkers.push(rMarker);
+                                //console.log(rMarker);
+                            }
+                            rPoly.setMap(map);
+                        }
+                    });
+                });
+            }
+
+            function openInfo(i) {
+                if (infoWins[i]) {
+                    lastInfoWin.close();
+                    lastInfoWin = infoWins[i];
+                    infoWins[i].open(rMarkers[i].getMap(), rMarkers[i]);
+                }
+            }
+
+            //ローバーアイコンのinfoWindow
+            function attachMessage(marker, msg) {
+                //http://www.nanchatte.com/map/showDifferentInfoWindowOnEachMarker.html
+                var infoWin = new google.maps.InfoWindow({
+                    maxWidth: 330, // infowindowの最大幅を設定
+                    content: msg
+                });
+                // イベントを取得するListenerを追加
+                google.maps.event.addListener(marker, 'click', function () {
+                    //次のウィンドウが表示されるまでウィンドウを表示
+                    lastInfoWin.close();
+                    lastInfoWin = infoWin;
+                    //ウィンドウオープン
+                    infoWin.open(marker.getMap(), marker);
+                });
+
+                //google.maps.event.addListener(marker, 'mouseout', function(){
+                google.maps.event.addListener(marker, 'closeclick', function () {
+                    infoWin.close();
+                });
+
+                return infoWin;
+
+            }
+//Google Maps JavaScript API の OverlayView クラスを使うと、独自のカスタム オーバーレイを作成できます。
+//https://developers.google.com/maps/documentation/javascript/customoverlays?hl=ja
+    </script>
+
+</head>
+
+<body>
+
+    <div style="position: absolute; top: 50px; left: 50px; z-index: 5;" id="info">info</div>
+    <div style="height:100%; width:98%; background-color: #AAA;" id="map-canvas"></div>
+</body>
+
+</html>

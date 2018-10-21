@@ -27,25 +27,29 @@
     <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCYgefNHuojh9xFK6EAWPDjQc8-x1bg4o0&amp;libraries=geometry"></script>
     <script src="https://www.gstatic.com/firebasejs/5.5.5/firebase.js"></script>
     <script>
-
         var google;
+        google.maps.event.addDomListener(window, 'load', initialize);
         var map;
-        //var makers = [];
-        //DOM読み込み完了　初期化
-        google.maps.event.addDomListener(window, 'load', function () {
-            //日本中心に地図
+
+        function initialize() {
+            //終了時　beforeunload　イベントがpeer.jsで上書きされるのでここで書いてもダメ。
+            //peer  が　出来てからでないとだめだった。
+            //クローム検証ウィンドウ（F12キー）のElementのEvent Listenersタグの再読み込みでわかった。
+            //$(window).on("beforeunload", function (e) {
+            //return; }
+            //デバッグ用→　document.getElementById("show_result").innerHTML = error.message;
             var mapOptions = {
-                zoom: 20,
-                //center: new google.maps.LatLng(35.839498, 137.959176), //35.839498,137.959176,19
-                mapTypeId: google.maps.MapTypeId.ROADMAP
+                zoom: 22,
+                //center: gPos,
+                mapTypeId: google.maps.MapTypeId.ROADMAP,
                 //mapTypeId: google.maps.MapTypeId.TERRAIN
-                //noClear: false //http://www.openspc2.org/Google/Maps/api3/Map_option/noClear/
+                noClear: false //http://www.openspc2.org/Google/Maps/api3/Map_option/noClear/
             };
             map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
-            map.setCenter(new google.maps.LatLng(35.8401073, 137.9581047));
-            // Check if current user has authorized this application. immediate: false
-        });
-
+            //初回地図定義 （ブラウザの位置情報が取得できない場合）サーリューション35.8401073,137.9581047
+            //TODO: Geolocation API の使用が　安全なサイトに制限、SSL導入しなければならない、
+            //http://netbeans-org.1045718.n5.nabble.com/How-to-debug-https-or-SSL-web-applications-in-netbeans-td2885406.html
+        }
         // Initialize Firebase
         var config = {
             apiKey: "AIzaSyB_x2pQrABuup5TTQ1sS80NA-vhKx-Q8Y0",

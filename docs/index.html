@@ -37,23 +37,9 @@
                 // 
                 zoom: 12
             });
+            var marker = new google.maps.Marker({ position: { lat: 35.8404, lng: 137.9581 }, map: map });
         }
-        //setMarker.setPosition(new google.maps.LatLng(35.8404, 137.9581));
-        // Create an array of alphabetical characters used to label the markers.
-        var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        function initMap() {
-            // The location of Uluru
-            var uluru = { lat: -25.344, lng: 131.036 };
-            // The map, centered at Uluru
-            var map = new google.maps.Map(
-                document.getElementById('map'), { zoom: 4, center: uluru });
-            // The marker, positioned at Uluru
-            var marker = new google.maps.Marker({ position: uluru, map: map });
-        }
-        // Add some markers to the map.
-        // Note: The code uses the JavaScript Array.prototype.map() method to
-        // create an array of markers based on a given "locations" array.
-        // The map() method here has nothing to do with the Google Maps API.
+
         var locations = [
             { lat: 35.8404, lng: 137.9581 },
             { lat: 35.8403, lng: 137.9582 },

@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>泊まりたい伊那 マップ</title>
+    <title>Tomari-ta-Ina マップ</title>
     <link rel="shortcut icon" href="favicon.ico">
 
     <!--link rel="stylesheet" href="style.css"
@@ -33,10 +33,33 @@
         function initMap() {
             map = new google.maps.Map(document.getElementById('map'), {
                 center: { lat: 35.840, lng: 137.958 },
-                // map.setCenter(new google.maps.LatLng(35.8401073, ));
-                zoom: 12
+                // 
+                zoom: 10
             });
         }
+        // Create an array of alphabetical characters used to label the markers.
+        var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+        // Add some markers to the map.
+        // Note: The code uses the JavaScript Array.prototype.map() method to
+        // create an array of markers based on a given "locations" array.
+        // The map() method here has nothing to do with the Google Maps API.
+        var markers = locations.map(function (location, i) {
+            return new google.maps.Marker({
+                position: location,
+                label: labels[i % labels.length]
+            });
+        });
+
+        // Add a marker clusterer to manage the markers.
+        var markerCluster = new MarkerClusterer(map, markers,
+            { imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m' });
+}
+        var locations = [
+            { lat: 35.8404, lng: 137.9581 },
+            { lat: 35.8403, lng: 137.9582 },
+            { lat: 35.8402, lng: 137.9583 },
+            { lat: 35.8401, lng: 137.9584 }];
         // Initialize Firebase
         var config = {
             apiKey: "AIzaSyB_x2pQrABuup5TTQ1sS80NA-vhKx-Q8Y0",

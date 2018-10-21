@@ -38,14 +38,17 @@
                 zoom: 12
             });
         }
+        var pos = new google.maps.LatLng(35.8404, 137.9581);
         var setMarker = new google.maps.Marker({
             icon: {
                 scale: 3,
                 strokeColor: '#0000FF'
-            }
+            },
+            map: map,
+            position: pos
         });
 
-        setMarker.setPosition(new google.maps.LatLng(35.8404, 137.9581));
+        //setMarker.setPosition(new google.maps.LatLng(35.8404, 137.9581));
         // Create an array of alphabetical characters used to label the markers.
         var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 

@@ -39,6 +39,9 @@
         };
         firebase.initializeApp(config);
 
+        var rootRef = firebase.database().ref();
+        console(rootRef);
+
         var google;
         var map;
         //var makers = [];

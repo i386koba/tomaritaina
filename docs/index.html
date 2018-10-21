@@ -35,9 +35,16 @@
             map = new google.maps.Map(document.getElementById('map'), {
                 center: { lat: 35.840, lng: 137.958 },
                 // 
-                zoom: 10
+                zoom: 12
             });
         }
+        var setMarker = new google.maps.Marker({
+            icon: {
+                scale: 3,
+                strokeColor: '#0000FF'
+            });
+
+        setMarker.setPosition(new google.maps.LatLng(35.8404, 137.9581);
         // Create an array of alphabetical characters used to label the markers.
         var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 

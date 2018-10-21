@@ -38,20 +38,18 @@
                 zoom: 12
             });
         }
-        //var pos = new google.maps.LatLng(35.8404, 137.9581);
-        var setMarker = new google.maps.Marker({
-            icon: {
-                scale: 3,
-                strokeColor: '#0000FF'
-            },
-            map: map,
-            position: { lat: 35.8404, lng: 137.9581 }
-        });
-
         //setMarker.setPosition(new google.maps.LatLng(35.8404, 137.9581));
         // Create an array of alphabetical characters used to label the markers.
         var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-
+        function initMap() {
+            // The location of Uluru
+            var uluru = { lat: -25.344, lng: 131.036 };
+            // The map, centered at Uluru
+            var map = new google.maps.Map(
+                document.getElementById('map'), { zoom: 4, center: uluru });
+            // The marker, positioned at Uluru
+            var marker = new google.maps.Marker({ position: uluru, map: map });
+        }
         // Add some markers to the map.
         // Note: The code uses the JavaScript Array.prototype.map() method to
         // create an array of markers based on a given "locations" array.
@@ -61,18 +59,6 @@
             { lat: 35.8403, lng: 137.9582 },
             { lat: 35.8402, lng: 137.9583 },
             { lat: 35.8401, lng: 137.9584 }];
-
-        var markers = locations.map(function (location, i) {
-            return new google.maps.Marker({
-                position: location,
-                label: labels[i % labels.length]
-            });
-        });
-
-        // Add a marker clusterer to manage the markers.
-        var markerCluster = new MarkerClusterer(map, markers,
-            //{ imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m' }
-        );
 
 
         // Initialize Firebase

@@ -38,14 +38,14 @@
                 zoom: 12
             });
         }
-        var pos = new google.maps.LatLng(35.8404, 137.9581);
+        //var pos = new google.maps.LatLng(35.8404, 137.9581);
         var setMarker = new google.maps.Marker({
             icon: {
                 scale: 3,
                 strokeColor: '#0000FF'
             },
             map: map,
-            position: pos
+            position: { lat: 35.8404, lng: 137.9581 }
         });
 
         //setMarker.setPosition(new google.maps.LatLng(35.8404, 137.9581));

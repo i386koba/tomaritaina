@@ -40,9 +40,36 @@
                 // 
                 zoom: 14
             });
-            marker1 = new google.maps.Marker({ position: { lat: 35.8404, lng: 137.9583 }, icon: { fillColor: "#FF0000" }, map: map });
-            marker2 = new google.maps.Marker({ position: { lat: 35.8493, lng: 137.9581 }, icon: { fillColor: "#00FF00" }, map: map });
-            marker3 = new google.maps.Marker({ position: { lat: 35.8482, lng: 137.9582 }, icon: { fillColor: "#0000FF" }, map: map });
+            marker1 = new google.maps.Marker({
+                position: { lat: 35.8404, lng: 137.9593 }, icon: {
+                    fillColor: "#FF0000",                //塗り潰し色
+                    fillOpacity: 0.8,                    //塗り潰し透過率
+                    path: google.maps.SymbolPath.CIRCLE, //円を指定
+                    scale: 16,                           //円のサイズ
+                    strokeColor: "#000000",              //枠の色
+                    strokeWeight: 1.0
+                }, map: map
+            });
+            marker2 = new google.maps.Marker({
+                position: { lat: 35.8493, lng: 137.9571 }, icon: {
+                    fillColor: "#00FF00",                //塗り潰し色
+                    fillOpacity: 0.8,                    //塗り潰し透過率
+                    path: google.maps.SymbolPath.CIRCLE, //円を指定
+                    scale: 16,                           //円のサイズ
+                    strokeColor: "#000000",              //枠の色
+                    strokeWeight: 1.0
+                }, map: map
+            });
+            marker3 = new google.maps.Marker({
+                position: { lat: 35.8482, lng: 137.9582 }, icon: {
+                    fillColor: "#0000FF",                //塗り潰し色
+                    fillOpacity: 0.8,                    //塗り潰し透過率
+                    path: google.maps.SymbolPath.CIRCLE, //円を指定
+                    scale: 16,                           //円のサイズ
+                    strokeColor: "#000000",              //枠の色
+                    strokeWeight: 1.0
+                }, map: map
+            });
         }
 
         // Initialize Firebase

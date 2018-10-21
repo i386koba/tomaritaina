@@ -31,21 +31,19 @@
     <script>
         var google;
         var map;
+        var maker1;
+        var maker2;
+        var maker3;
         function initMap() {
             map = new google.maps.Map(document.getElementById('map'), {
                 center: { lat: 35.840, lng: 137.958 },
                 // 
-                zoom: 12
+                zoom: 14
             });
-            var marker = new google.maps.Marker({ position: { lat: 35.8404, lng: 137.9581 }, map: map });
+            marker1 = new google.maps.Marker({ position: { lat: 35.8404, lng: 137.9581 }, map: map });
+            marker2 = new google.maps.Marker({ position: { lat: 35.8403, lng: 137.9582 }, map: map });
+            marker3 = new google.maps.Marker({ position: { lat: 35.8402, lng: 137.9583 }, map: map });
         }
-
-        var locations = [
-            { lat: 35.8404, lng: 137.9581 },
-            { lat: 35.8403, lng: 137.9582 },
-            { lat: 35.8402, lng: 137.9583 },
-            { lat: 35.8401, lng: 137.9584 }];
-
 
         // Initialize Firebase
         var config = {

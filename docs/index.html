@@ -39,13 +39,14 @@
             //return; }
             //デバッグ用→　document.getElementById("show_result").innerHTML = error.message;
             var mapOptions = {
-                zoom: 18,
+                zoom: 20,
                 //center: gPos,
                 mapTypeId: google.maps.MapTypeId.ROADMAP,
                 //mapTypeId: google.maps.MapTypeId.TERRAIN
                 noClear: false //http://www.openspc2.org/Google/Maps/api3/Map_option/noClear/
             };
             map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+            map.setCenter(new google.maps.LatLng(35.8401073, 137.9581047));
             //初回地図定義 （ブラウザの位置情報が取得できない場合）サーリューション35.8401073,137.9581047
             //TODO: Geolocation API の使用が　安全なサイトに制限、SSL導入しなければならない、
             //http://netbeans-org.1045718.n5.nabble.com/How-to-debug-https-or-SSL-web-applications-in-netbeans-td2885406.html
